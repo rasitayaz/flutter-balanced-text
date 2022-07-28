@@ -1,4 +1,4 @@
-# Balanced Text ⚖️
+# Flutter Balanced Text ⚖️
 
 [![Pub](https://img.shields.io/pub/v/balanced_text.svg?style=popout)](https://pub.dartlang.org/packages/balanced_text)
 [![](https://img.shields.io/badge/github-rasitayaz-red)](https://github.com/rasitayaz)
