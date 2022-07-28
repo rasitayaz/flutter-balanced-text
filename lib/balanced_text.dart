@@ -3,6 +3,16 @@ library balanced_text;
 import 'package:flutter/widgets.dart';
 
 class BalancedText extends StatelessWidget {
+  /// Creates a balanced text widget.
+  ///
+  /// If the [style] argument is null, the text will use the style from the
+  /// closest enclosing [DefaultTextStyle].
+  ///
+  /// The [data] parameter must not be null.
+  ///
+  /// The [overflow] property's behavior is affected by the [softWrap] argument.
+  /// If the [softWrap] is true or null, the glyph causing overflow, and those that follow,
+  /// will not be rendered. Otherwise, it will be shown with the given overflow option.
   const BalancedText(
     this.data, {
     Key? key,
@@ -55,7 +65,7 @@ class BalancedText extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Text(
-          _getBalanced(constraints.maxWidth),
+          _getBalanced(context, constraints.maxWidth),
           style: style,
           textAlign: textAlign,
           softWrap: softWrap,
@@ -66,9 +76,10 @@ class BalancedText extends StatelessWidget {
     );
   }
 
-  String _getBalanced(double width) {
+  /// Finds a balanced string by splitting the text into words.
+  String _getBalanced(BuildContext context, double width) {
     List<String> words = data.split(' ');
-    if (words.length < 3 || _getWidth(data) < width) return data;
+    if (words.length < 3 || _getWidth(context, data) < width) return data;
 
     List<String> balancedStrings = [];
 
@@ -76,11 +87,11 @@ class BalancedText extends StatelessWidget {
     for (int i = 1; i <= words.length; i++) {
       List<String> leadingWords = words.sublist(0, i);
       String leading = leadingWords.join(' ');
-      double leadingWidth = _getWidth(leading);
+      double leadingWidth = _getWidth(context, leading);
 
       List<String> remainingWords = words.sublist(i, words.length);
       String remaining = remainingWords.join(' ');
-      double remainingWidth = _getWidth(remaining);
+      double remainingWidth = _getWidth(context, remaining);
 
       double widthDifference = (leadingWidth - remainingWidth).abs();
 
@@ -98,9 +109,13 @@ class BalancedText extends StatelessWidget {
     return balancedStrings.join();
   }
 
-  double _getWidth(String? string) {
+  /// Calculates the width of the given text.
+  double _getWidth(BuildContext context, String? string) {
     TextPainter textPainter = TextPainter(
-      text: TextSpan(text: string, style: style),
+      text: TextSpan(
+        text: string,
+        style: style ?? DefaultTextStyle.of(context).style,
+      ),
       textDirection: TextDirection.ltr,
     )..layout();
 
