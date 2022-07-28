@@ -1,5 +1,5 @@
 name: balanced_text
-description: A new Flutter package project.
+description: A Flutter widget that simply balances the lines of two-line text
 version: 0.0.1
 homepage:
 
