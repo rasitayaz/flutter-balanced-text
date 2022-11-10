@@ -62,11 +62,71 @@ class BalancedText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveStyle = DefaultTextStyle.of(context).style.merge(style);
+
     return LayoutBuilder(
       builder: (context, constraints) {
+        /// Generates a balanced string by splitting the text into words.
+        String getBalancedText() {
+          final maxWidth = constraints.maxWidth;
+
+          if (data.contains('\n')) {
+            return data;
+          }
+
+          /// Calculates the width of the given text.
+          double getWidth(String? text) {
+            final textPainter = TextPainter(
+              text: TextSpan(
+                text: text,
+                style: effectiveStyle,
+              ),
+              textDirection: TextDirection.ltr,
+            )..layout();
+
+            print('$text: ${textPainter.width}');
+
+            return textPainter.size.width;
+          }
+
+          final words = data.split(' ');
+
+          if (words.length < 3 || getWidth(data) < maxWidth) {
+            return data;
+          }
+
+          var lastDifference = double.infinity;
+
+          for (int i = 1; i <= words.length; i++) {
+            final leading = words.sublist(0, i).join(' ');
+            final leadingWidth = getWidth(leading);
+
+            final remaining = words.sublist(i, words.length).join(' ');
+            final remainingWidth = getWidth(remaining);
+
+            if (leadingWidth > maxWidth) {
+              return data;
+            }
+
+            final widthDifference = (leadingWidth - remainingWidth).abs();
+
+            if (widthDifference > lastDifference) {
+              return [
+                words.sublist(0, i - 1).join(' '),
+                '\n',
+                words.sublist(i - 1, words.length).join(' '),
+              ].join();
+            }
+
+            lastDifference = widthDifference;
+          }
+
+          return data;
+        }
+
         return Text(
-          _getBalanced(context, constraints.maxWidth),
-          style: style,
+          getBalancedText(),
+          style: effectiveStyle,
           textAlign: textAlign,
           softWrap: softWrap,
           overflow: overflow,
@@ -74,51 +134,5 @@ class BalancedText extends StatelessWidget {
         );
       },
     );
-  }
-
-  /// Finds a balanced string by splitting the text into words.
-  String _getBalanced(BuildContext context, double width) {
-    List<String> words = data.split(' ');
-    if (words.length < 3 || _getWidth(context, data) < width) return data;
-
-    List<String> balancedStrings = [];
-
-    double lastDifference = double.infinity;
-    for (int i = 1; i <= words.length; i++) {
-      List<String> leadingWords = words.sublist(0, i);
-      String leading = leadingWords.join(' ');
-      double leadingWidth = _getWidth(context, leading);
-
-      List<String> remainingWords = words.sublist(i, words.length);
-      String remaining = remainingWords.join(' ');
-      double remainingWidth = _getWidth(context, remaining);
-
-      double widthDifference = (leadingWidth - remainingWidth).abs();
-
-      if (widthDifference > lastDifference) {
-        leading = words.sublist(0, i - 1).join(' ');
-        remaining = words.sublist(i - 1, words.length).join(' ');
-        balancedStrings.addAll([leading, '\n', remaining]);
-        break;
-      }
-
-      if (leadingWidth > width) return data;
-      lastDifference = widthDifference;
-    }
-
-    return balancedStrings.join();
-  }
-
-  /// Calculates the width of the given text.
-  double _getWidth(BuildContext context, String? string) {
-    TextPainter textPainter = TextPainter(
-      text: TextSpan(
-        text: string,
-        style: style ?? DefaultTextStyle.of(context).style,
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-
-    return textPainter.size.width;
   }
 }
