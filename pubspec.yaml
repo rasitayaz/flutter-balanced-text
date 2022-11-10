@@ -1,6 +1,6 @@
 name: balanced_text
 description: A Flutter widget that simply balances the lines of two-line text
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/rasitayaz/flutter-balanced-text
 repository: https://github.com/rasitayaz/flutter-balanced-text
 issue_tracker: https://github.com/rasitayaz/flutter-balanced-text/issues
