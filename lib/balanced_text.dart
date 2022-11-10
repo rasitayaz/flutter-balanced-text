@@ -84,8 +84,6 @@ class BalancedText extends StatelessWidget {
               textDirection: TextDirection.ltr,
             )..layout();
 
-            print('$text: ${textPainter.width}');
-
             return textPainter.size.width;
           }
 
